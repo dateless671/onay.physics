@@ -1,0 +1,20 @@
+head {
+    overflow: hidden;
+    margin: 0 auto;
+    padding: 0 auto;
+}
+body{
+  margin: 0 auto;
+  padding:0 auto; 
+  background-color: #F0EFE4;
+}
+.header__wrapper{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    color: #413E3E;
+
+}
+canvas{
+    display: block;
+}

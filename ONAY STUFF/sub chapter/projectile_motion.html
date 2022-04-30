@@ -1,0 +1,333 @@
+<script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-8175315-12"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-8175315-12');
+</script>
+
+<link rel="preconnect" href="https://fonts.gstatic.com"> 
+<link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com"> 
+<link href="https://fonts.googleapis.com/css2?family=Saira&display=swap" rel="stylesheet">
+
+
+
+  <meta charset="utf-8">
+  <title>Projectile Motion</title>
+</head>
+
+<body style="font-family:Saira; font-size:15px; width:620px; margin-left:auto; margin-right:auto;">
+<center>
+    <canvas id="myCanvas" width="620" height="340"></canvas>
+    <div id="buttons">
+      <input type="button" id="play" value="Play" onclick="play()">
+      <input type="button" id="pause" value="Pause" onclick="pause()">
+      <input type="button" id="stepback" value="<< Step" onclick="stepBack()">
+      <input type="button" id="stepforward" value="Step >>" onclick="stepForward()">
+      <input type="button" id="reset" value="Reset" onclick="reset()">
+    </div>
+     <div>Set the launch speed</div>
+     <div id="slider1">
+      10 m/s <input type="range" id="initialv" min="10" max="25" value="20" step="1" oninput="showValue(this.value)" onchange="showValue(this.value)"> 25 m/s
+<div id="initialvValue">20</div>
+    </div>
+     <div>Set the launch angle</div>
+     <div id="slider2">
+      0 deg. <input type="range" id="launchangle" min="0" max="90" value="45" step="1" oninput="showAngle(this.value)" onchange="showAngle(this.value)"> 90 deg.
+<div id="initialAngle">45</div>
+    </div>
+
+</center>
+
+  <script>
+
+      function showValue(newValue)
+      {
+             //get the element
+             var display = document.getElementById("initialvValue");
+             //show the amount
+             display.innerHTML=newValue;
+             index = 0;
+             vInit = newValue;
+             vInitx = vInit*Math.cos(theta);
+             vInity = vInit*Math.sin(theta);
+             maxTime = -2.0*vInity/a;
+             range = vInitx*maxTime;
+             maxHeight = -vInity*vInity/(2.0*a);
+             reset();
+     }
+
+      function showAngle(newAngle)
+      {
+             //get the element
+             var display = document.getElementById("initialAngle");
+             //show the amount
+             display.innerHTML=newAngle;
+             index = 0;
+             angle = newAngle;
+             theta = angle*Math.PI/180.0;
+             vInitx = vInit*Math.cos(theta);
+             vInity = vInit*Math.sin(theta);
+             maxTime = -2.0*vInity/a;
+             range = vInitx*maxTime;
+             maxHeight = -vInity*vInity/(2.0*a);
+             reset();
+     }
+
+      function play() {
+        window.clearTimeout(timer);
+        runFlag = 1;
+        runMotion();
+
+      }
+
+      function pause() {
+        window.clearTimeout(timer);
+        runFlag = 0;
+
+      }
+
+      function stepForward() {
+        window.clearTimeout(timer);
+        runFlag = 1;
+        drawMotion();
+
+      }
+
+      function stepBack() {
+        window.clearTimeout(timer);
+        index = index-2;
+        if (index < -1) index = -1;
+        time = index/20;
+        xPos = xBase;
+        runFlag = 1;
+        drawMotion();
+
+      }
+
+
+      function reset() {
+        window.clearTimeout(timer);
+        index = -1;
+        time = 0.0;
+        xPos = xBase;
+        runFlag = 1;
+        drawMotion();
+
+      }
+
+
+      var canvas = document.getElementById("myCanvas");
+      var context = canvas.getContext("2d");
+      var index = -1;
+      var xBase = 100;
+      var yBase = 50;
+      var xInit = 37;
+      var graphType = 2;
+      var graphTitle = 'Projectile motion trajectory';
+      var yAxisTitle = 'y (m)';
+      var slope = 0.4;
+      var yIncrement = 10;
+      var yNumDecimals = 0;
+      var yStart = yBase+160;
+      var plotColor = '#F0EFE4';
+      var radius = 6;
+      var a = -10.0;
+      var vInit = 20.0;
+      var angle = 45.0;
+      var theta = angle*Math.PI/180.0;
+      var vInitx = vInit*Math.cos(theta);
+      var vInity = vInit*Math.sin(theta);
+      var maxTime = -2.0*vInity/a;
+      var time = 0.0;
+      var range = vInitx*maxTime;
+      var maxHeight = -vInity*vInity/(2.0*a);
+      var timer;
+      var runFlag = 1;
+
+      drawMotion();
+
+    function drawMotion() {
+
+  //    console.log("In the drawMotion function, with runFlag = " + runFlag );
+
+      if ((yPos < 0 ) || (time == maxTime)) runFlag = 0;
+
+  //    console.log("In the drawMotion function, with runFlag = " + runFlag + " xPos = " + xPos);
+
+      if (runFlag == 1) {    //      run if runFlag equal 1, not if equal 0
+        // clear
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        index = index + 1;
+
+        // set background color for the entire thing
+           context.fillStyle = "#F0EFE4";
+           context.fillRect(0, 0, canvas.width, canvas.height);
+
+        // set background color for the graph
+           context.fillStyle = "#413E3E";
+           context.fillRect(xBase, yBase, 400, 160);
+
+        // set line color
+           context.strokeStyle = 'black';
+           context.lineWidth = 2;
+
+           var axisLabel = '';
+           var axisValue = 0;
+
+         // vertical grid lines
+         for (var i = 0; i <= 10; i++) {
+           context.beginPath();
+           context.moveTo(xBase+40*i, yBase);
+           context.lineTo(xBase+40*i, yBase+170);
+           context.stroke();
+           context.font = '14pt Saira';
+           context.fillStyle = '#413E3E';
+           context.textAlign = 'center';
+           context.textBaseline = 'middle';
+           axisValue = 10*i;
+           axisLabel = axisValue.toFixed(0);
+           context.fillText(axisLabel, xBase+40*i, yBase+180);
+          }
+
+         // horizontal grid lines
+         for (i = 0; i <= 4; i++) {
+           context.beginPath();
+           context.moveTo(xBase-10, yBase+40*i);
+           context.lineTo(xBase+400, yBase+40*i);
+           context.stroke();
+           context.font = '14pt Saira';
+           context.fillStyle = '#413E3E';
+           context.textAlign = 'center';
+           context.textBaseline = 'middle';
+ //          axisValue = 10*(4-i);
+           axisValue = yIncrement*(4-i);
+           axisLabel = axisValue.toFixed(yNumDecimals);
+           context.fillText(axisLabel, xBase-24, yBase+40*i);
+
+          }
+
+         // x-axis
+           context.strokeStyle = '#000';
+           context.lineWidth = 4;
+           context.beginPath();
+           context.moveTo(xBase-1, yBase+160);
+           context.lineTo(xBase+420, yBase+160);
+           context.stroke();
+           context.moveTo(xBase+410, yBase+160-6);
+           context.lineTo(xBase+420, yBase+160);
+           context.lineTo(xBase+410, yBase+160+6);
+           context.lineJoin = 'miter';
+           context.stroke();
+           context.font = '16pt Saira';
+           context.fillStyle = '#413E3E';
+           context.textAlign = 'left';
+           context.fillText('x (m)', xBase+428, yBase+160);
+
+         // y-axis
+           context.strokeStyle = '#000';
+           context.beginPath();
+           context.moveTo(xBase, yBase-20);
+           context.lineTo(xBase, yBase+160);
+           context.stroke();
+           context.moveTo(xBase-6, yBase-10);
+           context.lineTo(xBase, yBase-20);
+           context.lineTo(xBase+6, yBase-10);
+           context.lineJoin = 'miter';
+           context.stroke();
+           context.strokeStyle = '#000';
+           context.textAlign = 'center';
+           context.fillText(yAxisTitle, xBase-45, 22);
+
+        // draw graph
+
+           if (graphType == 1) {
+           context.strokeStyle = plotColor;
+           context.beginPath();
+           context.moveTo(xBase, yStart);
+           context.lineTo(xBase+2*index, yStart-slope*2*index);
+           context.stroke();
+
+           context.beginPath();
+           context.arc(xBase+2*index, yStart-slope*2*index, radius, 0, 2 * Math.PI, false);
+           context.fillStyle = plotColor;
+           context.fill();
+           context.lineWidth = 2;
+           context.strokeStyle = '#000000';
+           context.stroke();
+           }
+           else {
+           context.strokeStyle = plotColor;
+           context.beginPath();
+           context.moveTo(xBase, yStart);
+           for (var ival = 1; ival <=index; ival++) {
+             context.lineTo(xBase+4.0*vInitx*ival/20.0, yStart-4.0*vInity*(ival/20.0)-4.0*0.5*a*(ival/20.0)*(ival/20.0));
+           }
+           context.stroke();
+
+           context.beginPath();
+           context.arc(xBase+4.0*vInitx*index/20.0, yStart-4.0*vInity*(index/20.0)-4.0*0.5*a*(index/20.0)*(index/20.0), radius, 0, 2 * Math.PI, false);
+           context.fillStyle = plotColor;
+           context.fill();
+           context.lineWidth = 2;
+           context.strokeStyle = '#000000';
+           context.stroke();
+
+           }
+
+           // graph title
+           context.font = '18pt Russo One';
+           context.fillStyle = '#413E3E';
+           context.textAlign = 'center';
+           context.fillText(graphTitle, (canvas.width)/2, 20);
+
+           context.font = '16pt Saira';
+           context.fillStyle = '#413E3E';
+
+        time = index/20.0;
+        var yPos = vInity*time+0.5*a*time*time;
+        if (yPos < 0.0)
+         {
+           time = maxTime;
+           yPos = 0.0;
+         }
+
+        var timeLabel = 't = ';
+        timeLabel = timeLabel + time.toFixed(2) + ' s';
+        context.textAlign = 'left';
+        context.fillText(timeLabel, xBase+20, 270);
+
+        var xPos = vInitx*time;
+        var xPosLabel = 'x = ';
+        xPosLabel = xPosLabel + xPos.toFixed(2) + ' m';
+        context.textAlign = 'left';
+        context.fillText(xPosLabel, xBase+140, 270);
+
+        var yPosLabel = 'y = ';
+        yPosLabel = yPosLabel + yPos.toFixed(2) + ' m';
+        context.textAlign = 'left';
+        context.fillText(yPosLabel, xBase+270, 270);
+
+        context.fillText('g = 10 m/s/s', xBase+20, 310);
+
+        var maxHLabel = 'max. height = ';
+        maxHLabel = maxHLabel + maxHeight.toFixed(2) + ' m';
+        context.textAlign = 'left';
+        context.fillText(maxHLabel, xBase+200, 310);
+      }
+    }
+
+    function runMotion() {
+        drawMotion();
+        if (runFlag == 1) {
+          timer = window.setTimeout(runMotion, 1000/30);
+        }
+      }
+
+  </script>
+
+</body>
+</html>
